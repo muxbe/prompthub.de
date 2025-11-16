@@ -24,6 +24,7 @@ Stores all prompts submitted by users
 - description - what the prompt is for
 - prompt_text - the actual prompt content
 - category - Dropdown with 5 options (Coding, Business, Writing, Design, Other). If user selects "Other", they can type custom category name
+- copy_count - how many times this prompt was copied (number, starts at 0)
 - created_at - when it was created
 - updated_at - when it was last modified
 
@@ -128,7 +129,7 @@ Replace "your-project-url-here" and "your-anon-key-here" with the values you cop
 
 ### Database Files
 
-**`supabase/migrations/001_initial_schema.sql`**
+**`supabase/migrations/001_initial_schema.sql`** (migrations don't go in src/)
 - Creates all 4 tables
 - Sets up security rules (RLS policies)
 - Adds indexes for fast queries
@@ -138,26 +139,130 @@ Replace "your-project-url-here" and "your-anon-key-here" with the values you cop
 
 ### Database Connection
 
-**`lib/supabase/client.ts`**
+**`src/lib/supabase/client.ts`**
 - Connects to Supabase database
 - Creates client for making queries
 - Used by all other files
 
 ---
 
-### Query Functions
+## Database View: How Data Flows
 
-**`lib/supabase/queries/prompts.ts`**
+### Understanding the Data Structure
 
-Functions:
-- `getPrompts()` - get all prompts with filters and sorting
-- `getPromptById(id)` - get one specific prompt
-- `createPrompt(data)` - save new prompt to database
-- `searchPrompts(keyword)` - search prompts by text
+**We have RAW TABLES** (store individual pieces of data):
+- `prompts` - stores prompt info
+- `likes` - stores who liked what
+- `prompt_platforms` - stores which platforms work with which prompts
+- `ai_platforms` - stores platform names
+
+**We have a VIEW** (combines data from multiple tables):
+- `prompts_with_stats` - joins everything together
+
+**Query functions USE the view** to get complete data in one query.
+
+### Data Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ RAW TABLES (Database)                                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  prompts table          likes table         prompt_platforms│
+│  ├─ id                  ├─ prompt_id        ├─ prompt_id   │
+│  ├─ title               ├─ user_id          ├─ platform_id │
+│  ├─ description         └─ ...              └─ ...         │
+│  ├─ category                                                │
+│  ├─ copy_count                                              │
+│  └─ ...                                                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ VIEW (Combines tables automatically)                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  prompts_with_stats VIEW                                    │
+│  ├─ All prompt fields (title, description, etc.)           │
+│  ├─ author_email (from auth.users table)                   │
+│  ├─ like_count (COUNT of likes)                            │
+│  ├─ platforms (JSON array of platform names)               │
+│  └─ Calculated on-the-fly when queried                     │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ QUERY FUNCTIONS (lib/supabase/queries/)                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  getPrompts()           getPromptById()                     │
+│  ├─ Queries VIEW        ├─ Queries VIEW                    │
+│  ├─ Adds filtering      ├─ Gets single row                 │
+│  ├─ Adds sorting        └─ Returns enriched data           │
+│  └─ Returns array                                           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│ COMPONENTS (React/Next.js)                                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Homepage                Detail Page                        │
+│  ├─ Calls getPrompts()  ├─ Calls getPromptById()          │
+│  ├─ Gets array with:    ├─ Gets object with:              │
+│  │  • All prompt data   │  • All prompt data              │
+│  │  • author_email      │  • author_email                 │
+│  │  • like_count        │  • like_count                   │
+│  │  • platforms list    │  • platforms list               │
+│  └─ Displays cards      └─ Displays detail                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Why Use a View?
+
+**Without view**: Need 3 separate queries
+1. Get prompts
+2. Count likes for each prompt
+3. Get platforms for each prompt
+
+**With view**: One query gets everything!
+
+**Performance**: Database does the joining efficiently
+
+**Simplicity**: Query functions just use the view, don't worry about joins
 
 ---
 
-**`lib/supabase/queries/likes.ts`**
+### Query Functions
+
+**`src/lib/supabase/queries/prompts.ts`**
+
+Functions:
+- `getPrompts()` - get all prompts with enriched data
+  - Queries `prompts_with_stats` view (not raw prompts table)
+  - Returns: prompt data + author_email + like_count + platforms array
+  - Supports: filtering by category, searching, sorting
+  - Example: `[{id, title, description, category, author_email: "user@example.com", like_count: 45, platforms: [{name: "ChatGPT"}, ...]}]`
+
+- `getPromptById(id)` - get one specific prompt with all details
+  - Queries `prompts_with_stats` view
+  - Returns single object with enriched data
+  - Example: `{id, title, description, prompt_text, author_email: "user@example.com", like_count: 45, platforms: [...]}`
+
+- `createPrompt(data)` - save new prompt to database
+  - Inserts into raw `prompts` table
+  - Also inserts into `prompt_platforms` junction table
+  - Returns the created prompt
+
+- `incrementCopyCount(promptId)` - increase copy counter
+  - Updates `copy_count` field in prompts table
+  - Called when user clicks copy button (Step 4)
+  - No return value needed
+
+---
+
+**`src/lib/supabase/queries/likes.ts`**
 
 Functions:
 - `toggleLike(promptId, userId)` - add or remove like
@@ -167,7 +272,7 @@ Functions:
 
 ---
 
-**`lib/supabase/queries/auth.ts`**
+**`src/lib/supabase/queries/auth.ts`**
 
 Functions:
 - `getCurrentUser()` - get logged-in user info
@@ -178,7 +283,7 @@ Functions:
 
 ### Authentication Pages
 
-**`app/login/page.tsx`**
+**`src/app/login/page.tsx`**
 
 What it shows:
 - Page title "Login"
@@ -196,7 +301,7 @@ What it does:
 
 ---
 
-**`app/register/page.tsx`**
+**`src/app/register/page.tsx`**
 
 What it shows:
 - Page title "Create Account"
@@ -215,13 +320,149 @@ What it does:
 
 ---
 
-**`lib/auth/middleware.ts`** (helper file)
+**`src/lib/auth/middleware.ts`** (helper file)
 
 What it does:
 - Protects pages that need login
 - Checks if user is logged in
 - Redirects to login page if not
 - Used on "Add Prompt" page and other protected pages
+
+---
+
+## Project Structure & Standards
+
+### Folder Structure
+
+**We follow the Lab37 Constitution** (see `docs/lab-37-constitution.md`)
+
+All source code goes in `src/` folder:
+
+```
+prompthub.de/
+├── src/
+│   ├── app/                    # Next.js routes
+│   │   ├── (public)/          # Public pages (no auth)
+│   │   │   ├── page.tsx       # Homepage
+│   │   │   └── prompts/[id]/
+│   │   ├── (auth)/            # Protected pages
+│   │   │   └── prompts/new/
+│   │   ├── login/
+│   │   └── register/
+│   ├── components/
+│   │   ├── prompts/           # Prompt components
+│   │   ├── ui/                # Reusable UI
+│   │   └── layout/            # Layout components
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts
+│   │   │   └── queries/
+│   │   ├── auth/
+│   │   └── utils/
+│   └── types/
+│       └── database.ts        # Generated Supabase types
+├── supabase/
+│   └── migrations/            # Database migrations (not in src/)
+├── .env.local                 # Environment variables
+└── package.json
+```
+
+**Important**: The `src/` folder keeps code organized and separate from config files.
+
+---
+
+### TypeScript Types
+
+**Where types are generated**: `src/types/database.ts`
+
+**How to generate**:
+```bash
+npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/database.ts
+```
+
+**How to use in query functions**:
+```typescript
+// src/lib/supabase/queries/prompts.ts
+import { Database } from '@/types/database';
+
+type Prompt = Database['public']['Tables']['prompts']['Row'];
+type PromptInsert = Database['public']['Tables']['prompts']['Insert'];
+
+export async function getPrompts(): Promise<Prompt[]> {
+  // TypeScript knows the shape of data!
+}
+```
+
+**Why this matters**: TypeScript autocomplete and type safety for all database operations.
+
+---
+
+### Environment Variables Usage
+
+**File**: `.env.local` (in project root, NOT in src/)
+
+**Contents**:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key-here
+```
+
+**How to use in code** (`src/lib/supabase/client.ts`):
+```typescript
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+```
+
+**Important**:
+- `NEXT_PUBLIC_` prefix = available in browser
+- Without prefix = server-only
+- Never commit `.env.local` to GitHub!
+
+---
+
+### Server vs Client Components (Glossary)
+
+**Server Components** (default in Next.js 15):
+- Run on server
+- Can fetch data directly
+- Cannot use state, events, or browser APIs
+- Faster initial load
+- Example: Pages that fetch and display data
+
+```typescript
+// src/app/(public)/page.tsx
+// No 'use client' = Server Component
+export default async function HomePage() {
+  const prompts = await getPrompts(); // Direct DB query!
+  return <div>{/* Display prompts */}</div>
+}
+```
+
+**Client Components** (need 'use client'):
+- Run in browser
+- Can use state (useState, useReducer)
+- Can use events (onClick, onChange)
+- Can use browser APIs
+- Example: Forms, buttons, interactive UI
+
+```typescript
+// src/components/prompts/PromptCard.tsx
+'use client'; // ← This makes it a Client Component
+
+export function PromptCard() {
+  const [liked, setLiked] = useState(false);
+
+  return <button onClick={() => setLiked(!liked)}>Like</button>
+}
+```
+
+**When to use each**:
+- **Use Server** by default (better performance)
+- **Use Client** only when you need: state, events, browser APIs
 
 ---
 

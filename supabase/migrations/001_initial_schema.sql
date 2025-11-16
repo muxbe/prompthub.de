@@ -14,6 +14,7 @@ CREATE TABLE prompts (
   description TEXT NOT NULL,
   prompt_text TEXT NOT NULL,
   category TEXT NOT NULL,  -- Free text, user can type any category
+  copy_count INTEGER DEFAULT 0,  -- Track how many times prompt was copied
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -144,10 +145,11 @@ CREATE POLICY "Users can remove platforms from their prompts"
 -- 5. HELPFUL VIEWS
 -- =====================================================
 
--- View to get prompts with like counts and platforms
+-- View to get prompts with like counts, platforms, and author info
 CREATE OR REPLACE VIEW prompts_with_stats AS
 SELECT
   p.*,
+  u.email as author_email,
   COUNT(DISTINCT l.id) as like_count,
   COALESCE(
     json_agg(
@@ -156,10 +158,11 @@ SELECT
     '[]'::json
   ) as platforms
 FROM prompts p
+LEFT JOIN auth.users u ON p.user_id = u.id
 LEFT JOIN likes l ON p.id = l.prompt_id
 LEFT JOIN prompt_platforms pp ON p.id = pp.prompt_id
 LEFT JOIN ai_platforms ap ON pp.platform_id = ap.id
-GROUP BY p.id;
+GROUP BY p.id, u.email;
 
 -- =====================================================
 -- DONE!

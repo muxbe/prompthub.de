@@ -36,6 +36,8 @@ Set up the database structure and user authentication system. Create tables for 
 
 Build the main homepage where users can see all available prompts in a grid layout. Each prompt shows its category, title, description, and statistics. When users click on a prompt card, they go to a detail page that shows the complete prompt with options to open it in different AI platforms.
 
+**Note**: Like/copy buttons show counts but are not functional yet (Step 4). Platform buttons are placeholders (open homepage only).
+
 **Deliverable**: Users can browse all prompts and click to see full details
 
 ---
