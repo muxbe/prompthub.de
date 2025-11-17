@@ -172,9 +172,22 @@ What it does:
 - Shows empty state if no prompts
 - Server component (fetches data on server)
 
+**Auth Pattern** (following Lab37 Constitution):
+```typescript
+import { getOptionalUser } from '@/lib/supabase/queries/auth';
+
+export default async function HomePage() {
+  const user = await getOptionalUser(); // Optional - for personalization
+  const prompts = await getPrompts();
+
+  return <PromptsGrid prompts={prompts} />;
+}
+```
+
 Data needed:
 - All prompts with like counts and platform info
 - Sorted by newest first (for now, sorting comes in Step 4)
+- User (optional, for showing if logged in)
 
 ---
 
@@ -222,10 +235,17 @@ Props it receives:
 What it renders:
 - Complete prompt display
 - All action buttons
-- Platform buttons
+- Platform buttons (show "Coming soon" message) ✅
 - Metadata section
+- Similar prompts section (3 from same category) ✅
 
 Type: Client component (has interactive buttons)
+
+**Platform Buttons Behavior** (v1):
+- Clicking "Open in ChatGPT" shows tooltip: "Coming soon - copy prompt manually for now"
+- Don't open platform URLs in v1
+- Visual placeholders only
+- v2: Implement deep linking when platforms support it
 
 ---
 
@@ -247,7 +267,7 @@ Type: Client component (simple, reusable)
 **6. `src/components/layout/Header.tsx`**
 
 Props it receives:
-- user (current logged-in user or null)
+- **NONE** - Gets user from AuthProvider context ✅
 
 What it renders:
 - Site logo (links to home)
@@ -255,8 +275,34 @@ What it renders:
 - Login button (if not logged in)
 - User menu (if logged in)
 - "Add Prompt" button (if logged in)
+- Library button (📚) - placeholder, shows "Coming soon" ✅
 
 Type: Client component (has dropdown menus and links)
+
+**Auth Pattern** (following Lab37 Constitution):
+```typescript
+'use client';
+import { useAuth } from '@/lib/auth/auth-context';
+
+export function Header() {
+  const { user } = useAuth(); // From context, not props
+
+  return (
+    <nav>
+      {/* Logo, nav items */}
+      {user ? (
+        <>
+          <button>Add (+)</button>
+          <button onClick={() => alert('Coming soon')}>Library (📚)</button>
+          <span>{user.email}</span>
+        </>
+      ) : (
+        <a href="/login">Login</a>
+      )}
+    </nav>
+  );
+}
+```
 
 ---
 
@@ -275,7 +321,35 @@ Type: Client component (handles clicks and opens new tabs)
 
 ---
 
-**8. `src/components/ui/EmptyState.tsx`**
+**8. `src/components/prompts/SimilarPrompts.tsx`** ✅ (NEW)
+
+Props it receives:
+- currentPromptId (string) - To exclude current prompt
+- category (string) - To find similar prompts
+
+What it renders:
+- Section title: "Similar Prompts"
+- 3 prompt cards from same category (random selection)
+- Small card format (compact version)
+- Link to each prompt detail page
+
+Type: Server Component (fetches data)
+
+**Logic** (v1 simple implementation):
+- Query prompts with same category
+- Exclude current prompt
+- Random order (or newest)
+- Limit to 3 results
+- If <3 available, show what exists
+- If 0, show "No similar prompts found"
+
+**Used where**: Prompt detail page (bottom of right sidebar)
+
+**v2 Enhancement**: Could use tags, AI similarity, user behavior for better matching
+
+---
+
+**9. `src/components/ui/EmptyState.tsx`**
 
 Props it receives:
 - message (text to show)
@@ -548,9 +622,15 @@ This step does NOT include:
 - ❌ Sorting (Step 4)
 - ❌ Creating prompts (Step 3)
 - ❌ Real icons (added later)
-- ❌ Working "Open in AI" buttons (placeholders only in v1)
+- ❌ Working "Open in AI" buttons (placeholders only in v1 - show "Coming soon") ✅
+- ❌ Library button functionality (placeholder only - show "Coming soon") ✅
 - ❌ User photos/profiles (just email in v1)
 - ❌ Tracking who copied prompts (just count total copies)
+
+**What IS Included** (clarifications):
+- ✅ Platform buttons appear but clicking shows "Coming soon" tooltip
+- ✅ Library button (📚) appears in header but shows "Coming soon" when clicked
+- ✅ Similar Prompts section shows 3 prompts from same category
 
 We're just displaying prompts and viewing details. Interactions come next!
 

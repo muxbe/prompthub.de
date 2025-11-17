@@ -2,7 +2,7 @@
 
 **Status**: Planning Phase
 **Date**: November 16, 2025
-**Route**: `/registration`
+**Route**: `/register` ✅ (DECISION: Use shorter route name)
 
 ---
 

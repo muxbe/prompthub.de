@@ -274,10 +274,16 @@ Functions:
 
 **`src/lib/supabase/queries/auth.ts`**
 
-Functions:
-- `getCurrentUser()` - get logged-in user info
-- `requireAuth()` - check if user is logged in, redirect if not
-- `getOptionalUser()` - get user if logged in, null if not
+Functions following Lab37 Constitution pattern:
+
+- `getOptionalUser()` - get user if logged in, null if not (primary pattern ✅)
+  - Use in Server Components for auth checks
+  - Returns User object or null
+  - Example: `const user = await getOptionalUser();`
+
+- `requireAuth()` - DEPRECATED - Use `getOptionalUser()` + manual redirect instead
+  - Old pattern: `const user = await requireAuth();`
+  - New pattern: `const user = await getOptionalUser(); if (!user) redirect('/login');`
 
 ---
 
@@ -320,13 +326,83 @@ What it does:
 
 ---
 
-**`src/lib/auth/middleware.ts`** (helper file)
+**Authentication Pattern** (following Lab37 Constitution)
+
+**Server-Side Auth Check** (in page.tsx):
+```typescript
+import { getOptionalUser } from '@/lib/supabase/queries/auth';
+import { redirect } from 'next/navigation';
+
+export default async function ProtectedPage() {
+  const user = await getOptionalUser();
+  if (!user) redirect('/login');
+
+  // Page content...
+}
+```
+
+**Client-Side Auth State** (for Header, etc.):
+- Use AuthProvider context (see constitution)
+- Provider wraps app in root layout
+- Client components use `useAuth()` hook
+- No props needed - gets user from context
+
+---
+
+### AuthProvider Setup (Constitution Pattern)
+
+**`src/lib/auth/auth-context.tsx`**
 
 What it does:
-- Protects pages that need login
-- Checks if user is logged in
-- Redirects to login page if not
-- Used on "Add Prompt" page and other protected pages
+- Provides auth state to all client components
+- Eliminates need to pass user as props
+- Handles auth state changes automatically
+
+**Usage in root layout**:
+```typescript
+// src/app/layout.tsx (Server Component)
+import { getOptionalUser } from '@/lib/supabase/queries/auth';
+import { AuthProvider } from '@/lib/auth/auth-context';
+
+export default async function RootLayout({ children }) {
+  const user = await getOptionalUser(); // Server-side fetch
+
+  return (
+    <html>
+      <body>
+        <AuthProvider initialUser={user}>
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+**Usage in client components**:
+```typescript
+// src/components/layout/Header.tsx (Client Component)
+'use client';
+import { useAuth } from '@/lib/auth/auth-context';
+
+export function Header() {
+  const { user } = useAuth(); // No async, from context
+
+  return (
+    <nav>
+      {user ? <span>{user.email}</span> : <a href="/login">Login</a>}
+    </nav>
+  );
+}
+```
+
+**Why this pattern**:
+- Server fetches user once per request
+- Client components get user from context (no props needed)
+- No hydration mismatches
+- Follows Lab37 Constitution exactly
+
+See `docs/lab-37-constitution.md` lines 660-738 for full details.
 
 ---
 

@@ -147,7 +147,7 @@
 - **Link hover**: Underline
 - **Font size**: 14px
 - **Text align**: Center
-- **Action**: Navigate to `/registration` page
+- **Action**: Navigate to `/register` page ✅
 
 ---
 
