@@ -24,6 +24,7 @@ Stores all prompts submitted by users
 - description - what the prompt is for
 - prompt_text - the actual prompt content
 - category - Dropdown with 5 options (Coding, Business, Writing, Design, Other). If user selects "Other", they can type custom category name
+- like_count - how many users liked this prompt (number, starts at 0)
 - copy_count - how many times this prompt was copied (number, starts at 0)
 - created_at - when it was created
 - updated_at - when it was last modified
@@ -35,7 +36,7 @@ Stores all prompts submitted by users
 
 ---
 
-### 2. likes
+### 2. prompt_likes
 Tracks which users liked which prompts
 
 **Fields**:
@@ -272,7 +273,7 @@ Functions:
 
 ---
 
-**`src/lib/supabase/queries/auth.ts`**
+**`src/lib/supabase/queries/auth.ts`** (Lab37 Constitution requirement)
 
 Functions following Lab37 Constitution pattern:
 
@@ -280,10 +281,35 @@ Functions following Lab37 Constitution pattern:
   - Use in Server Components for auth checks
   - Returns User object or null
   - Example: `const user = await getOptionalUser();`
+  - **Implementation**:
+    ```typescript
+    import { createClient } from '@/lib/supabase/server';
 
-- `requireAuth()` - DEPRECATED - Use `getOptionalUser()` + manual redirect instead
-  - Old pattern: `const user = await requireAuth();`
-  - New pattern: `const user = await getOptionalUser(); if (!user) redirect('/login');`
+    export async function getOptionalUser() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    }
+    ```
+
+- `requireAuth()` - redirects to login if not authenticated
+  - Use when page requires authentication
+  - Returns User object or redirects
+  - Example: `const user = await requireAuth();`
+  - **Implementation**:
+    ```typescript
+    import { redirect } from 'next/navigation';
+
+    export async function requireAuth() {
+      const user = await getOptionalUser();
+      if (!user) {
+        redirect('/login');
+      }
+      return user;
+    }
+    ```
+
+**Note**: Lab37 Constitution (line 118) recommends creating `src/lib/auth/helpers.ts` for these functions. However, we're placing them in `src/lib/supabase/queries/auth.ts` to keep auth queries co-located with other database queries. Both approaches are acceptable.
 
 ---
 

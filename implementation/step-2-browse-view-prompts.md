@@ -24,7 +24,7 @@ Build the main homepage where users can see all available prompts in a grid layo
 ## Pages We're Creating
 
 ### 1. Homepage / Prompts List Page
-**URL**: `/` (maps to `src/app/(public)/page.tsx`)
+**URL**: `/` (maps to `src/app/page.tsx`)
 
 **What it shows**:
 - Header with logo and navigation
@@ -63,7 +63,10 @@ Build the main homepage where users can see all available prompts in a grid layo
 - Shows all details
 - Allows liking (if logged in) - coming in Step 4
 - Allows copying prompt text - coming in Step 4
-- Opens prompt in AI platform when button clicked
+- Platform buttons show "Coming soon" message (v1 - no deep linking yet)
+- **Note**: See DECISIONS.md #7 for platform buttons decision
+
+**Note for Step 4**: In Step 4, we will add a "Similar Prompts" section below the main content that shows 3 related prompts from the same category.
 
 ---
 

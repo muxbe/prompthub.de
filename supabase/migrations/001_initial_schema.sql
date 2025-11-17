@@ -48,7 +48,7 @@ CREATE POLICY "Users can delete own prompts"
 -- =====================================================
 -- 2. LIKES TABLE
 -- =====================================================
-CREATE TABLE likes (
+CREATE TABLE prompt_likes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   prompt_id UUID REFERENCES prompts(id) ON DELETE CASCADE NOT NULL,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -57,23 +57,23 @@ CREATE TABLE likes (
 );
 
 -- Indexes
-CREATE INDEX idx_likes_prompt_id ON likes(prompt_id);
-CREATE INDEX idx_likes_user_id ON likes(user_id);
+CREATE INDEX idx_prompt_likes_prompt_id ON prompt_likes(prompt_id);
+CREATE INDEX idx_prompt_likes_user_id ON prompt_likes(user_id);
 
 -- Enable Row Level Security
-ALTER TABLE likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE prompt_likes ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for likes
+-- RLS Policies for prompt_likes
 CREATE POLICY "Anyone can view likes"
-  ON likes FOR SELECT
+  ON prompt_likes FOR SELECT
   USING (true);
 
 CREATE POLICY "Authenticated users can create likes"
-  ON likes FOR INSERT
+  ON prompt_likes FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own likes"
-  ON likes FOR DELETE
+  ON prompt_likes FOR DELETE
   USING (auth.uid() = user_id);
 
 -- =====================================================
