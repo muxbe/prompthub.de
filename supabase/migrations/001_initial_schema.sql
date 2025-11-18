@@ -150,7 +150,7 @@ CREATE OR REPLACE VIEW prompts_with_stats AS
 SELECT
   p.*,
   u.email as author_email,
-  COUNT(DISTINCT l.id) as like_count,
+  COUNT(DISTINCT pl.id)::INTEGER as like_count,
   COALESCE(
     json_agg(
       DISTINCT jsonb_build_object('id', ap.id, 'name', ap.name)
@@ -159,15 +159,29 @@ SELECT
   ) as platforms
 FROM prompts p
 LEFT JOIN auth.users u ON p.user_id = u.id
-LEFT JOIN likes l ON p.id = l.prompt_id
+LEFT JOIN prompt_likes pl ON p.id = pl.prompt_id
 LEFT JOIN prompt_platforms pp ON p.id = pp.prompt_id
 LEFT JOIN ai_platforms ap ON pp.platform_id = ap.id
 GROUP BY p.id, u.email;
 
 -- =====================================================
+-- 6. HELPER FUNCTIONS
+-- =====================================================
+
+-- Function to increment copy count
+CREATE OR REPLACE FUNCTION increment_copy_count(prompt_id UUID)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE prompts
+  SET copy_count = copy_count + 1
+  WHERE id = prompt_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- =====================================================
 -- DONE!
 -- =====================================================
 -- Database schema is ready for v1
--- Tables: prompts, likes, ai_platforms, prompt_platforms
+-- Tables: prompts, prompt_likes, ai_platforms, prompt_platforms
 -- Security: RLS enabled on all tables
 -- Performance: Indexes added for common queries
