@@ -3,8 +3,9 @@
 
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { LikeButton } from '@/components/prompts/LikeButton';
 import type { Database } from '@/types/database';
 
 type PromptWithStats = Database['public']['Views']['prompts_with_stats']['Row'];
@@ -14,15 +15,24 @@ type PromptCardProps = {
 };
 
 export function PromptCard({ prompt }: PromptCardProps) {
+  const router = useRouter();
+
   // Truncate description to 2 lines (roughly 100 chars)
   const truncateText = (text: string, maxLength: number = 100) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + '...';
   };
 
+  // Handle card click (navigate to detail page)
+  const handleCardClick = () => {
+    router.push(`/prompts/${prompt.id}`);
+  };
+
   return (
-    <Link href={`/prompts/${prompt.id}`}>
-      <article className="group h-full bg-white border border-gray-200 rounded-lg p-5 hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer">
+    <article
+      onClick={handleCardClick}
+      className="group h-full bg-white border border-gray-200 rounded-lg p-5 hover:shadow-lg hover:border-gray-300 transition-all duration-200 cursor-pointer"
+    >
         {/* Category Badge */}
         <div className="mb-3">
           <CategoryBadge category={prompt.category} size="small" />
@@ -41,32 +51,14 @@ export function PromptCard({ prompt }: PromptCardProps) {
         {/* Divider */}
         <div className="border-t border-gray-200 my-4"></div>
 
-        {/* Footer: Author, Like count, Copy count */}
+        {/* Footer: Author, Stats, Like Button */}
         <div className="flex items-center justify-between text-sm text-gray-500">
-          {/* Author */}
-          <div className="flex items-center gap-1 truncate">
-            <svg
-              className="w-4 h-4 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <span className="truncate">{prompt.author_email || 'Anonymous'}</span>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            {/* Like count */}
-            <div className="flex items-center gap-1" title={`${prompt.like_count} likes`}>
+          {/* Left: Author and Copy count */}
+          <div className="flex items-center gap-3">
+            {/* Author */}
+            <div className="flex items-center gap-1 truncate">
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="w-4 h-4 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -75,10 +67,10 @@ export function PromptCard({ prompt }: PromptCardProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span>{prompt.like_count}</span>
+              <span className="truncate">{prompt.author_email || 'Anonymous'}</span>
             </div>
 
             {/* Copy count */}
@@ -99,8 +91,21 @@ export function PromptCard({ prompt }: PromptCardProps) {
               <span>{prompt.copy_count}</span>
             </div>
           </div>
+
+          {/* Right: Like Button (clickable, stops propagation) */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click
+            }}
+            className="flex-shrink-0"
+          >
+            <LikeButton
+              promptId={prompt.id}
+              initialLikes={prompt.like_count || 0}
+              variant="compact"
+            />
+          </div>
         </div>
       </article>
-    </Link>
-  );
-}
+    );
+  }

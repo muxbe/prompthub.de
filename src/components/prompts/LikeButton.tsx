@@ -11,12 +11,14 @@ export type LikeButtonProps = {
   promptId: string;
   initialLikes: number;
   initialIsLiked?: boolean;
+  variant?: 'default' | 'compact';
 };
 
 export function LikeButton({
   promptId,
   initialLikes,
   initialIsLiked = false,
+  variant = 'default',
 }: LikeButtonProps) {
   const router = useRouter();
   const [isLiked, setIsLiked] = useState(initialIsLiked);
@@ -79,6 +81,38 @@ export function LikeButton({
     }
   };
 
+  // Compact variant for cards
+  if (variant === 'compact') {
+    return (
+      <button
+        onClick={handleClick}
+        disabled={isLoading}
+        className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+        title={optimisticLiked ? 'Unlike this prompt' : 'Like this prompt'}
+      >
+        <svg
+          className={`w-4 h-4 transition-colors ${
+            optimisticLiked
+              ? 'text-red-500 fill-red-500'
+              : 'text-gray-400 hover:text-red-500'
+          }`}
+          fill={optimisticLiked ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
+        </svg>
+        <span className="text-sm font-medium text-gray-700">{likeCount}</span>
+      </button>
+    );
+  }
+
+  // Default variant for detail page
   return (
     <button
       onClick={handleClick}
