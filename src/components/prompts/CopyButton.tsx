@@ -1,17 +1,17 @@
 // CopyButton Component
 // Client component - copies prompt text to clipboard
-// Note: In Step 2, this just copies. Step 4 will add incrementCopyCount
 
 'use client';
 
 import { useState } from 'react';
+import { incrementCopyCountAction } from '@/actions/copyAction';
 
 type CopyButtonProps = {
   promptText: string;
   promptId: string;
 };
 
-export function CopyButton({ promptText }: CopyButtonProps) {
+export function CopyButton({ promptText, promptId }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -44,7 +44,11 @@ export function CopyButton({ promptText }: CopyButtonProps) {
         document.body.removeChild(textArea);
       }
 
-      // TODO: Step 4 will call incrementCopyCount here
+      // Increment copy count in background (don't await, fire and forget)
+      incrementCopyCountAction(promptId).catch((error) => {
+        console.error('Failed to increment copy count:', error);
+        // Don't show error to user - this is not critical
+      });
     } catch (error) {
       console.error('Failed to copy:', error);
       alert('Failed to copy to clipboard');
