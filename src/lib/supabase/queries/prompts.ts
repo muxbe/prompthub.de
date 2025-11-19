@@ -26,7 +26,16 @@ export async function getPrompts(
 
   // Filter by category
   if (options.category && options.category !== 'all') {
-    query = query.eq('category', options.category);
+    if (options.category === 'Other') {
+      // Show all custom categories (not in the main 4)
+      query = query
+        .neq('category', 'Copywriting')
+        .neq('category', 'Development')
+        .neq('category', 'Marketing')
+        .neq('category', 'Education');
+    } else {
+      query = query.eq('category', options.category);
+    }
   }
 
   // Search in title and description
@@ -188,4 +197,24 @@ export async function getSimilarPrompts(
   }
 
   return data || [];
+}
+
+/**
+ * Get all unique categories from prompts
+ * Used for dynamic category filter
+ */
+export async function getUniqueCategories(supabase: Client): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('prompts')
+    .select('category')
+    .order('category');
+
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+
+  // Get unique categories
+  const uniqueCategories = [...new Set(data.map((item) => item.category))];
+  return uniqueCategories;
 }

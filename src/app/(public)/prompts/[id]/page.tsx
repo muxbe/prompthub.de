@@ -11,7 +11,7 @@ import { PlatformButtons } from '@/components/prompts/PlatformButtons';
 import { SimilarPrompts } from '@/components/prompts/SimilarPrompts';
 import { CopyButton } from '@/components/prompts/CopyButton';
 import { CopyLinkButton } from '@/components/prompts/CopyLinkButton';
-import { LikeButton } from '@/components/prompts/LikeButton';
+import { LikeButtonFull } from '@/components/prompts/LikeButtonFull';
 
 type PageProps = {
   params: Promise<{
@@ -97,6 +97,9 @@ export default async function PromptDetailPage({ params }: PageProps) {
           <div className="space-y-6">
             {/* Action Buttons */}
             <div className="space-y-3">
+              {/* Like Button - Full width button above copy buttons */}
+              <LikeButtonFull promptId={prompt.id} initialLikes={prompt.like_count} />
+
               <CopyButton promptText={prompt.prompt_text} promptId={prompt.id} />
               <CopyLinkButton />
             </div>
@@ -107,10 +110,10 @@ export default async function PromptDetailPage({ params }: PageProps) {
             {/* Stats Block */}
             <div className="border border-gray-200 rounded-lg p-4">
               <div className="grid grid-cols-2 gap-3">
-                <LikeButton
-                  promptId={prompt.id}
-                  initialLikes={prompt.like_count}
-                />
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{prompt.like_count}</div>
+                  <div className="text-xs text-gray-500">Likes</div>
+                </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900">{prompt.copy_count}</div>
                   <div className="text-xs text-gray-500">Copied</div>

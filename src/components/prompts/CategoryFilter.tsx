@@ -6,21 +6,22 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const categories = [
-  { value: 'all', label: 'All' },
-  { value: 'Coding', label: 'Coding' },
-  { value: 'Business', label: 'Business' },
-  { value: 'Writing', label: 'Writing' },
-  { value: 'Design', label: 'Design' },
-  { value: 'Other', label: 'Other' },
-];
-
 type CategoryFilterProps = {
   currentCategory: string;
 };
 
 export function CategoryFilter({ currentCategory }: CategoryFilterProps) {
   const searchParams = useSearchParams();
+
+  // Hardcoded categories - custom categories will show under "Other"
+  const categories = [
+    { value: 'all', label: 'All' },
+    { value: 'Copywriting', label: 'Copywriting' },
+    { value: 'Development', label: 'Development' },
+    { value: 'Marketing', label: 'Marketing' },
+    { value: 'Education', label: 'Education' },
+    { value: 'Other', label: 'Other' },
+  ];
 
   const buildUrl = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
