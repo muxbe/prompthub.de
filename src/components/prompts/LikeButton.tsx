@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState, useEffect, useOptimistic } from 'react';
+import { useState, useEffect, useOptimistic, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toggleLikeAction, checkUserLikedAction } from '@/actions/likeAction';
 
@@ -41,18 +41,22 @@ export function LikeButton({
 
     setIsLoading(true);
 
-    // Optimistic update
+    // Optimistic update wrapped in startTransition
     const newIsLiked = !optimisticLiked;
-    setOptimisticLiked(newIsLiked);
-    setLikeCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
+    startTransition(() => {
+      setOptimisticLiked(newIsLiked);
+      setLikeCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
+    });
 
     try {
       const result = await toggleLikeAction(promptId);
 
       if (!result.success) {
         // Revert optimistic update on error
-        setOptimisticLiked(!newIsLiked);
-        setLikeCount((prev) => (newIsLiked ? prev - 1 : prev + 1));
+        startTransition(() => {
+          setOptimisticLiked(!newIsLiked);
+          setLikeCount((prev) => (newIsLiked ? prev - 1 : prev + 1));
+        });
 
         if (result.error) {
           alert(result.error);
@@ -65,8 +69,10 @@ export function LikeButton({
     } catch (error) {
       console.error('Error toggling like:', error);
       // Revert optimistic update
-      setOptimisticLiked(!newIsLiked);
-      setLikeCount((prev) => (newIsLiked ? prev - 1 : prev + 1));
+      startTransition(() => {
+        setOptimisticLiked(!newIsLiked);
+        setLikeCount((prev) => (newIsLiked ? prev - 1 : prev + 1));
+      });
       alert('Failed to toggle like');
     } finally {
       setIsLoading(false);
