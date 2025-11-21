@@ -21,68 +21,86 @@ export function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Left: Logo */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700">
-              PromptHub
+            <Link href="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 hover:text-gray-700">
+              <svg
+                className="w-8 h-8"
+                viewBox="0 0 32 32"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
+                {/* 3D Cube/Puzzle Icon */}
+                <path d="M16 2L26 8L26 18L16 24L6 18L6 8L16 2Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 2L16 12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 12L26 18" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 12L6 18" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 12L26 8" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 12L6 8" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 5L21 10L16 13" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M11 5L11 10L16 13" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>prompthub.ge</span>
             </Link>
           </div>
 
           {/* Right: Auth-dependent buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {user ? (
               <>
                 {/* Add Prompt Button */}
                 <Link
                   href="/prompts/new"
-                  className="inline-flex items-center text-gray-700 hover:text-gray-900"
-                  title="Add new prompt"
+                  className="inline-flex items-center gap-2 text-gray-800 hover:text-gray-900"
+                  title="დამატება"
                 >
                   <svg
                     className="w-5 h-5"
+                    viewBox="0 0 20 20"
                     fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v16m8-8H4"
-                    />
+                    <line x1="10" y1="3" x2="10" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="square"/>
+                    <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="square"/>
                   </svg>
+                  <span className="text-sm font-medium">დამატება</span>
                 </Link>
 
                 {/* Library Button (Placeholder) */}
                 <button
                   onClick={handleLibraryClick}
-                  className="inline-flex items-center text-gray-700 hover:text-gray-900"
-                  title="Library (Coming soon)"
+                  className="inline-flex items-center gap-2 text-gray-800 hover:text-gray-900"
+                  title="ბიბლიოთეკა"
                 >
                   <svg
                     className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
                     viewBox="0 0 24 24"
+                    fill="none"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
+                    {/* Colorful layered books/library icon */}
+                    <rect x="3" y="6" width="18" height="3" rx="0.5" fill="#FCD34D" stroke="#1F2937" strokeWidth="0.8"/>
+                    <rect x="3" y="10" width="18" height="3" rx="0.5" fill="#34D399" stroke="#1F2937" strokeWidth="0.8"/>
+                    <rect x="3" y="14" width="18" height="3" rx="0.5" fill="#60A5FA" stroke="#1F2937" strokeWidth="0.8"/>
+                    <rect x="3" y="18" width="18" height="3" rx="0.5" fill="#F87171" stroke="#1F2937" strokeWidth="0.8"/>
                   </svg>
+                  <span className="text-sm font-medium">ბიბლიოთეკა</span>
                 </button>
 
-                {/* User Menu */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">{user.email}</span>
-                  <form action={logoutAction}>
-                    <button
-                      type="submit"
-                      className="text-sm text-gray-600 hover:text-gray-900"
+                {/* User Icon */}
+                <div className="flex items-center">
+                  <button
+                    className="inline-flex items-center text-gray-700 hover:text-gray-900"
+                    title={user.email}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
                     >
-                      Logout
-                    </button>
-                  </form>
+                      <circle cx="12" cy="8" r="4" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
+                    </svg>
+                  </button>
                 </div>
               </>
             ) : (
