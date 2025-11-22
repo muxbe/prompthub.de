@@ -10,7 +10,6 @@ const sortOptions = [
   { value: 'popular', label: 'პოპულარული', icon: '⭐' },
   { value: 'new', label: 'ახალი', icon: '🔥' },
   { value: 'most_copied', label: 'გამოყენებული', icon: '☑️' },
-  { value: 'trending', label: 'ახალი', icon: '⚡' },
 ];
 
 type SortFilterProps = {

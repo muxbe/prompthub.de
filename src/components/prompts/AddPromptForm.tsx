@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PromptFormPreview } from './PromptFormPreview';
+import { getCategoriesForForm } from '@/lib/constants/categories';
 
 type Platform = {
   id: string;
@@ -243,41 +244,13 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
               <option value="" disabled>
                 აირჩიე კატეგორია...
               </option>
-              <option value="UI/UX დიზაინი">UI/UX დიზაინი</option>
-              <option value="არტიციალური">არტი და კრეატიული</option>
-              <option value="ბიზნესი">ბიზნესი</option>
-              <option value="განათლება">განათლება</option>
-              <option value="დეველოპმენტი">დეველოპმენტი</option>
-              <option value="მარკეტინგი">მარკეტინგი</option>
-              <option value="კოპირაითინგი">კოპირაითინგი</option>
-              <option value="ანალიტიკა">ანალიტიკა</option>
-              <option value="თავემი">თავემი</option>
+              {getCategoriesForForm().map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
             </select>
             {errors.category && <p className="text-sm text-red-500 mt-1">{errors.category}</p>}
-
-            {/* Custom Category Input (shows when "თავემი" selected) */}
-            {formData.category === 'თავემი' && (
-              <div className="mt-3">
-                <input
-                  type="text"
-                  value={formData.customCategory}
-                  onChange={(e) => handleInputChange('customCategory', e.target.value)}
-                  placeholder="შეიყვანეთ თქვენი კატეგორია..."
-                  maxLength={50}
-                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                    errors.customCategory ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
-                <div className="flex justify-between items-center mt-1">
-                  {errors.customCategory && (
-                    <p className="text-sm text-red-500">{errors.customCategory}</p>
-                  )}
-                  <p className={`text-xs ml-auto ${getCharCountColor(customCategoryCount, 50)}`}>
-                    {customCategoryCount}/50
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* AI Platforms Field */}

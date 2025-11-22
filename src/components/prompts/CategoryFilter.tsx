@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { CATEGORIES } from '@/lib/constants/categories';
 
 type CategoryFilterProps = {
   currentCategory: string;
@@ -35,17 +36,6 @@ export function CategoryFilter({ currentCategory }: CategoryFilterProps) {
 
     scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
   };
-
-  // Hardcoded categories - custom categories will show under "Other"
-  const categories = [
-    { value: 'all', label: 'ყველა', icon: '🔍' },
-    { value: 'არტი და კრეატიული', label: 'არტი და კრეატიული', icon: '🧠' },
-    { value: 'ბიზნესი', label: 'ბიზნესი', icon: '💼' },
-    { value: 'განათლება', label: 'განათლება', icon: '🎓' },
-    { value: 'დეველოპმენტი', label: 'დეველოპმენტი', icon: '💻' },
-    { value: 'თარგმნა', label: 'თარგმნა', icon: '🌐' },
-    { value: 'კვლევა', label: 'კვლევა', icon: '🔬' },
-  ];
 
   const buildUrl = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -81,7 +71,7 @@ export function CategoryFilter({ currentCategory }: CategoryFilterProps) {
         onScroll={handleScroll}
         className="flex-1 flex items-center gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-12"
       >
-        {categories.map((cat) => {
+        {CATEGORIES.map((cat) => {
           const isActive = currentCategory === cat.value;
 
           return (

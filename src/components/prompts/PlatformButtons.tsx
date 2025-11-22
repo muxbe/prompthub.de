@@ -13,7 +13,6 @@ type Platform = {
 
 type PlatformButtonsProps = {
   platforms: Json;
-  promptText: string;
 };
 
 export function PlatformButtons({ platforms }: PlatformButtonsProps) {
