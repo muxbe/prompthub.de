@@ -16,7 +16,7 @@ export async function toggleLike(
   userId: string
 ): Promise<boolean> {
   // Check if user already liked this prompt
-  const { data: existingLike, error: fetchError } = await supabase
+  const { data: existingLike } = await supabase
     .from('prompt_likes')
     .select('id')
     .eq('prompt_id', promptId)
@@ -28,7 +28,8 @@ export async function toggleLike(
     const { error } = await supabase
       .from('prompt_likes')
       .delete()
-      .eq('id', existingLike.id);
+      .eq('prompt_id', promptId)
+      .eq('user_id', userId);
 
     if (error) {
       console.error('Error removing like:', error);
