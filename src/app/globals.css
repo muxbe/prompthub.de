@@ -24,4 +24,97 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+/* Hide ALL browser's default password reveal/autofill icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="email"]::-ms-reveal,
+input[type="email"]::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="email"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="email"]::-webkit-textfield-decoration-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hide Chrome's show/hide password button */
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+/* Completely disable Edge password reveal */
+input::-ms-reveal {
+  display: none !important;
+}
+
+input::-ms-clear {
+  display: none !important;
+}
+
+/* Remove autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+/* Prevent custom SVG icons from interfering with input */
+input + svg,
+input ~ svg {
+  pointer-events: none !important;
+}
+
+/* Ensure only one icon shows in relative container */
+.relative svg[viewBox] {
+  pointer-events: none !important;
+}
+
+/* Fix for duplicate icons - keep only first custom icon */
+.relative .input-icon-custom ~ .input-icon-custom {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Ensure our custom icons always display and don't duplicate */
+.input-icon-custom {
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+/* Force single icon per input field */
+.relative:has(input) svg:nth-of-type(n+2) {
+  display: none !important;
 }

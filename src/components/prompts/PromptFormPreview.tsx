@@ -21,45 +21,49 @@ export function PromptFormPreview({
   customCategory,
 }: PromptFormPreviewProps) {
   // Determine which category to display
-  const displayCategory = category === 'Other' && customCategory ? customCategory : category;
+  const displayCategory = category === 'თავემი' && customCategory ? customCategory : category;
 
   return (
-    <div className="border border-gray-200 rounded-lg p-6 bg-white">
-      <h5 className="text-lg font-semibold mb-4">Preview</h5>
+    <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+      <h5 className="text-base font-medium text-gray-700 mb-6">გადახედვა</h5>
 
-      {/* Title Preview Section */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
-        {category && (
-          <div className="mb-2">
-            <CategoryBadge category={displayCategory} />
-          </div>
-        )}
-        <h3 className="text-xl font-bold text-gray-900">
-          {title || 'Your title will appear here'}
+      {/* Preview Card */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-3">
+          {title || 'თქვენი პრომპტის სათაური'}
         </h3>
-      </div>
 
-      {/* Description Preview Section */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
-        <p className="text-gray-700 text-sm">
-          {description || 'Your prompt description will be shown here'}
+        {/* Description */}
+        <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+          {description || 'თქვენი პრომპტის აღწერა გამოჩნდება აქ...'}
         </p>
-      </div>
 
-      {/* Prompt Text Preview Section */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
-        <p className="text-xs font-medium text-gray-500 mb-2">Your prompt text:</p>
-        <div className="bg-gray-50 p-3 rounded border border-gray-100 font-mono text-sm text-gray-800 whitespace-pre-wrap">
-          {promptText || 'Your prompt will appear here'}
+        {/* Bottom Stats */}
+        <div className="flex items-center gap-4 text-sm">
+          {/* User Icon */}
+          <div className="flex items-center gap-1.5 text-gray-700">
+            <svg className="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+            <span>თქვენი</span>
+          </div>
+          {/* Like/Thumbs Up Icon - Orange */}
+          <div className="flex items-center gap-1.5 text-gray-700">
+            <svg className="w-4 h-4" fill="#f97316" viewBox="0 0 20 20">
+              <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+            </svg>
+            <span>0</span>
+          </div>
+          {/* Clipboard/Copy Icon */}
+          <div className="flex items-center gap-1.5 text-gray-700">
+            <svg className="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+              <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+            </svg>
+            <span>0</span>
+          </div>
         </div>
-      </div>
-
-      {/* Bottom Icons Section */}
-      <hr className="border-gray-200 mb-4" />
-      <div className="flex justify-end items-center gap-3 text-gray-400">
-        <span className="text-xl">👤</span>
-        <span className="text-xl">❤️</span>
-        <span className="text-xl">📋</span>
       </div>
     </div>
   );

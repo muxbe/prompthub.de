@@ -153,19 +153,19 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
       {/* Form Section (Left - 60%) */}
       <div className="lg:col-span-3">
         <div className="border border-gray-200 rounded-lg p-8 bg-white">
-          <h2 className="text-2xl font-bold mb-6">Create New Prompt</h2>
+          <h2 className="text-2xl font-bold mb-6">დამატება</h2>
 
           {/* Title Field */}
           <div className="mb-6">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-              Title*
+              სათაური *
             </label>
             <input
               type="text"
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Example title..."
+              placeholder="მაგ: React კომპონენტის დეგბაგი"
               maxLength={200}
               className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                 errors.title ? 'border-red-500' : 'border-gray-300'
@@ -182,13 +182,13 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
           {/* Description Field */}
           <div className="mb-6">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              Description*
+              აღწერა *
             </label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="What does it do? When would you use it?"
+              placeholder="რას აკეთებს ეს პრომპტი? როდის გამოიყენებთ?"
               maxLength={1000}
               rows={4}
               className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
@@ -206,13 +206,13 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
           {/* Prompt Text Field */}
           <div className="mb-6">
             <label htmlFor="promptText" className="block text-sm font-medium text-gray-700 mb-2">
-              Text of prompt*
+              პრომპტის ტექსტი *
             </label>
             <textarea
               id="promptText"
               value={formData.promptText}
               onChange={(e) => handleInputChange('promptText', e.target.value)}
-              placeholder="Paste prompt here"
+              placeholder="ჩასვით პრომპტის ტექსტი აქ..."
               maxLength={5000}
               rows={6}
               className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono text-sm ${
@@ -230,7 +230,7 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
           {/* Category Field */}
           <div className="mb-6">
             <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-              Choose category*
+              კატეგორია *
             </label>
             <select
               id="category"
@@ -241,24 +241,28 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
               }`}
             >
               <option value="" disabled>
-                Select category...
+                აირჩიე კატეგორია...
               </option>
-              <option value="Copywriting">Copywriting</option>
-              <option value="Development">Development</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Education">Education</option>
-              <option value="Other">Other</option>
+              <option value="UI/UX დიზაინი">UI/UX დიზაინი</option>
+              <option value="არტიციალური">არტი და კრეატიული</option>
+              <option value="ბიზნესი">ბიზნესი</option>
+              <option value="განათლება">განათლება</option>
+              <option value="დეველოპმენტი">დეველოპმენტი</option>
+              <option value="მარკეტინგი">მარკეტინგი</option>
+              <option value="კოპირაითინგი">კოპირაითინგი</option>
+              <option value="ანალიტიკა">ანალიტიკა</option>
+              <option value="თავემი">თავემი</option>
             </select>
             {errors.category && <p className="text-sm text-red-500 mt-1">{errors.category}</p>}
 
-            {/* Custom Category Input (shows when "Other" selected) */}
-            {formData.category === 'Other' && (
+            {/* Custom Category Input (shows when "თავემი" selected) */}
+            {formData.category === 'თავემი' && (
               <div className="mt-3">
                 <input
                   type="text"
                   value={formData.customCategory}
                   onChange={(e) => handleInputChange('customCategory', e.target.value)}
-                  placeholder="Enter custom category..."
+                  placeholder="შეიყვანეთ თქვენი კატეგორია..."
                   maxLength={50}
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none ${
                     errors.customCategory ? 'border-red-500' : 'border-gray-300'
@@ -279,8 +283,7 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
           {/* AI Platforms Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              AI Platforms
-              <span className="text-gray-500 font-normal ml-2">(Optional)</span>
+              სადვებიციალირია (არასავალდებულო)
             </label>
             <div className="space-y-2">
               {platforms.map((platform) => (
@@ -306,7 +309,7 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
                 onChange={(e) => handleInputChange('visibility', e.target.checked)}
                 className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="text-sm text-gray-700">Will be visible for all</span>
+              <span className="text-sm text-gray-700">საჯარო (ყველასთვის ხელმისაწვდომი)</span>
             </label>
           </div>
 
@@ -318,21 +321,21 @@ export function AddPromptForm({ platforms, userId }: AddPromptFormProps) {
           )}
 
           {/* Form Buttons */}
-          <div className="flex justify-between items-center">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => router.back()}
               disabled={isSubmitting}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-white shadow-sm hover:bg-gray-50 text-gray-700 h-9 px-4 py-2 flex-1"
             >
-              Cancel
+              გაუქმება
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white shadow hover:bg-blue-700 h-9 px-4 py-2 flex-1"
             >
-              {isSubmitting ? 'Creating...' : 'Create Prompt'}
+              {isSubmitting ? 'იტვირთება...' : 'გამოქვეყნება'}
             </button>
           </div>
         </div>

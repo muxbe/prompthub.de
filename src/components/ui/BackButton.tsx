@@ -10,7 +10,7 @@ type BackButtonProps = {
   text?: string;
 };
 
-export function BackButton({ href = '/', text = '← Come back' }: BackButtonProps) {
+export function BackButton({ href = '/', text = '← უკან მთავარ გვერდზე' }: BackButtonProps) {
   return (
     <Link
       href={href}

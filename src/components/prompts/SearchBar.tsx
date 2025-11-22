@@ -44,7 +44,7 @@ export function SearchBar({ initialValue = '' }: SearchBarProps) {
   return (
     <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
           <svg
             className="h-5 w-5 text-gray-400"
             fill="none"
@@ -63,8 +63,8 @@ export function SearchBar({ initialValue = '' }: SearchBarProps) {
           type="text"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          placeholder="Search for prompts..."
-          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="მოძებნე წებისთვი პრომპტები..."
+          className="w-full h-16 pl-14 pr-6 border-2 border-neutral-200 bg-white rounded-2xl text-lg text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
           disabled={isPending}
         />
         {searchValue && (

@@ -19,42 +19,41 @@ export async function SimilarPrompts({
   const similarPrompts = await getSimilarPrompts(supabase, currentPromptId, category, 3);
 
   if (similarPrompts.length === 0) {
-    return (
-      <div className="text-center py-4 text-sm text-gray-500">
-        No similar prompts found
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="space-y-3">
-      <h4 className="text-sm font-medium text-gray-700">Similar Prompts</h4>
+    <div className="space-y-4">
+      <h4 className="text-lg font-medium text-gray-900">გადახედეთ</h4>
       <div className="space-y-3">
         {similarPrompts.map((prompt) => (
           <Link
             key={prompt.id}
             href={`/prompts/${prompt.id}`}
-            className="block border border-gray-200 rounded-md p-3 hover:shadow-md hover:border-gray-300 transition-all"
+            className="block bg-gray-50 border-2 border-gray-100 rounded-lg p-4 hover:shadow-md hover:border-gray-200 transition-all"
           >
-            <div className="mb-2">
-              <CategoryBadge category={prompt.category} size="small" />
-            </div>
-            <h5 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
+            <h5 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
               {prompt.title}
             </h5>
-            <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
               {prompt.description}
             </p>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  {prompt.like_count}
-                </span>
+            <div className="flex items-center gap-3 text-sm text-gray-600">
+              {/* Author */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-base leading-none" style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}>👤</span>
+                <span className="text-gray-700">{prompt.author_email?.split('@')[0] || 'ანონიმი'}</span>
               </div>
-              <span className="text-blue-600 font-medium">View →</span>
+              {/* Likes */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-base leading-none" style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}>👍</span>
+                <span className="text-gray-700">{prompt.like_count || 0}</span>
+              </div>
+              {/* Comments */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-base leading-none" style={{ fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif' }}>📋</span>
+                <span className="text-gray-700">{prompt.copy_count || 0}</span>
+              </div>
             </div>
           </Link>
         ))}
