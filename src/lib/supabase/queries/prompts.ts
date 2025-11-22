@@ -22,7 +22,7 @@ export async function getPrompts(
   supabase: Client,
   options: GetPromptsOptions = {}
 ): Promise<PromptWithStats[]> {
-  let query = supabase.from('prompts_with_stats').select('*');
+  let query = (supabase.from('prompts_with_stats') as any).select('*');
 
   // Filter by category
   if (options.category && options.category !== 'all') {
@@ -101,8 +101,8 @@ export async function createPrompt(
   platformIds: string[]
 ): Promise<string> {
   // Insert prompt
-  const { data: newPrompt, error: promptError } = await supabase
-    .from('prompts')
+  const { data: newPrompt, error: promptError } = await (supabase
+    .from('prompts') as any)
     .insert(prompt)
     .select('id')
     .single();
@@ -119,8 +119,8 @@ export async function createPrompt(
       platform_id: platformId,
     }));
 
-    const { error: platformError } = await supabase
-      .from('prompt_platforms')
+    const { error: platformError } = await (supabase
+      .from('prompt_platforms') as any)
       .insert(platformLinks);
 
     if (platformError) {
@@ -141,7 +141,7 @@ export async function incrementCopyCount(
   supabase: Client,
   promptId: string
 ): Promise<void> {
-  const { error } = await supabase.rpc('increment_copy_count', {
+  const { error } = await (supabase as any).rpc('increment_copy_count', {
     prompt_id: promptId,
   });
 
@@ -204,8 +204,8 @@ export async function getSimilarPrompts(
  * Used for dynamic category filter
  */
 export async function getUniqueCategories(supabase: Client): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('prompts')
+  const { data, error } = await (supabase
+    .from('prompts') as any)
     .select('category')
     .order('category');
 
@@ -215,6 +215,6 @@ export async function getUniqueCategories(supabase: Client): Promise<string[]> {
   }
 
   // Get unique categories
-  const uniqueCategories = [...new Set(data.map((item) => item.category))];
+  const uniqueCategories = [...new Set(data.map((item: any) => item.category))] as string[];
   return uniqueCategories;
 }

@@ -12,8 +12,8 @@ type Platform = Database['public']['Tables']['ai_platforms']['Row'];
  * Used in the "Add Prompt" form to populate checkboxes
  */
 export async function getPlatforms(supabase: Client): Promise<Platform[]> {
-  const { data, error } = await supabase
-    .from('ai_platforms')
+  const { data, error } = await (supabase
+    .from('ai_platforms') as any)
     .select('*')
     .order('name');
 
@@ -32,8 +32,8 @@ export async function getPlatformById(
   supabase: Client,
   id: string
 ): Promise<Platform | null> {
-  const { data, error } = await supabase
-    .from('ai_platforms')
+  const { data, error } = await (supabase
+    .from('ai_platforms') as any)
     .select('*')
     .eq('id', id)
     .single();
@@ -53,8 +53,8 @@ export async function getPlatformByName(
   supabase: Client,
   name: string
 ): Promise<Platform | null> {
-  const { data, error } = await supabase
-    .from('ai_platforms')
+  const { data, error } = await (supabase
+    .from('ai_platforms') as any)
     .select('*')
     .eq('name', name)
     .single();
