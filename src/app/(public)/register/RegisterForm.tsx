@@ -1,7 +1,7 @@
 // Registration Form Client Component
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { registerAction, type FormState } from '@/app/actions/auth';
 import Link from 'next/link';
 
@@ -10,6 +10,47 @@ export default function RegisterForm() {
     registerAction,
     {}
   );
+
+  const [fieldErrors, setFieldErrors] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  const validateEmail = (email: string) => {
+    if (!email) return 'ელ. ფოსტა აუცილებელია';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return 'გთხოვთ შეიყვანოთ ვალიდური ელ. ფოსტა';
+    return '';
+  };
+
+  const validatePassword = (password: string) => {
+    if (!password) return 'პაროლი აუცილებელია';
+    if (password.length < 6) return 'პაროლი უნდა იყოს მინიმუმ 6 სიმბოლო';
+    return '';
+  };
+
+  const validateConfirmPassword = (password: string, confirmPassword: string) => {
+    if (!confirmPassword) return 'გაიმეორეთ პაროლი';
+    if (password !== confirmPassword) return 'პაროლები არ ემთხვევა';
+    return '';
+  };
+
+  const handleBlur = (field: string, value: string, passwordValue?: string) => {
+    let error = '';
+    switch (field) {
+      case 'email':
+        error = validateEmail(value);
+        break;
+      case 'password':
+        error = validatePassword(value);
+        break;
+      case 'confirmPassword':
+        error = validateConfirmPassword(passwordValue || '', value);
+        break;
+    }
+    setFieldErrors(prev => ({ ...prev, [field]: error }));
+  };
 
   return (
     <form className="space-y-4" action={formAction}>
@@ -25,7 +66,10 @@ export default function RegisterForm() {
             type="email"
             autoComplete="email"
             required
-            className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            onBlur={(e) => handleBlur('email', e.target.value)}
+            className={`w-full pl-3 pr-8 py-2 border rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 text-sm ${
+              fieldErrors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+            }`}
             placeholder="m@example.com"
           />
           <svg
@@ -47,6 +91,9 @@ export default function RegisterForm() {
             </g>
           </svg>
         </div>
+        {fieldErrors.email && (
+          <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+        )}
       </div>
 
       {/* Password Field */}
@@ -61,7 +108,10 @@ export default function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
-            className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            onBlur={(e) => handleBlur('password', e.target.value)}
+            className={`w-full pl-3 pr-8 py-2 border rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 text-sm ${
+              fieldErrors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+            }`}
             placeholder="••••••••"
           />
           <svg
@@ -83,6 +133,9 @@ export default function RegisterForm() {
             </g>
           </svg>
         </div>
+        {fieldErrors.password && (
+          <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+        )}
       </div>
 
       {/* Confirm Password Field */}
@@ -97,7 +150,13 @@ export default function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
-            className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            onBlur={(e) => {
+              const passwordInput = document.getElementById('password') as HTMLInputElement;
+              handleBlur('confirmPassword', e.target.value, passwordInput?.value);
+            }}
+            className={`w-full pl-3 pr-8 py-2 border rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 text-sm ${
+              fieldErrors.confirmPassword ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+            }`}
             placeholder="••••••••"
           />
           <svg
@@ -119,6 +178,9 @@ export default function RegisterForm() {
             </g>
           </svg>
         </div>
+        {fieldErrors.confirmPassword && (
+          <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
+        )}
       </div>
 
       {state.error && (

@@ -3,6 +3,7 @@
 
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { getPromptById } from '@/lib/supabase/queries/prompts';
 import { Header } from '@/components/layout/Header';
@@ -19,6 +20,40 @@ type PageProps = {
     id: string;
   }>;
 };
+
+// Generate dynamic metadata for each prompt
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const prompt = await getPromptById(supabase, id);
+
+  if (!prompt) {
+    return {
+      title: 'პრომპტი ვერ მოიძებნა - PromptHub',
+      description: 'პრომპტი ვერ მოიძებნა',
+    };
+  }
+
+  const description = prompt.description || prompt.prompt_text.substring(0, 160);
+
+  return {
+    title: `${prompt.title} - PromptHub`,
+    description,
+    keywords: ['პრომპტი', prompt.category, 'AI', 'ChatGPT', 'Claude', prompt.title],
+    openGraph: {
+      title: prompt.title,
+      description,
+      type: 'article',
+      publishedTime: prompt.created_at,
+      authors: [prompt.author_email || 'PromptHub User'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: prompt.title,
+      description,
+    },
+  };
+}
 
 export default async function PromptDetailPage({ params }: PageProps) {
   const { id } = await params;

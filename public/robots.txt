@@ -1,0 +1,17 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow authentication pages
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+
+# Disallow API routes
+Disallow: /api/
+
+# Allow prompt pages
+Allow: /prompts/
+
+# Sitemap location
+Sitemap: https://prompthub.ge/sitemap.xml
