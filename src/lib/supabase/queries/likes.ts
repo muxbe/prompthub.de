@@ -39,10 +39,12 @@ export async function toggleLike(
     return false; // Unliked
   } else {
     // Like: add new like
-    const { error } = await supabase.from('prompt_likes').insert({
-      prompt_id: promptId,
-      user_id: userId,
-    });
+    const { error } = await supabase
+      .from('prompt_likes')
+      .insert([{
+        prompt_id: promptId,
+        user_id: userId,
+      }]);
 
     if (error) {
       console.error('Error adding like:', error);
