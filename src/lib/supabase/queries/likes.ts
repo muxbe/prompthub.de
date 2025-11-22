@@ -16,8 +16,8 @@ export async function toggleLike(
   userId: string
 ): Promise<boolean> {
   // Check if user already liked this prompt
-  const { data: existingLike } = await supabase
-    .from('prompt_likes')
+  const { data: existingLike } = await (supabase
+    .from('prompt_likes') as any)
     .select('id')
     .eq('prompt_id', promptId)
     .eq('user_id', userId)
@@ -25,8 +25,8 @@ export async function toggleLike(
 
   if (existingLike) {
     // Unlike: remove the like
-    const { error } = await supabase
-      .from('prompt_likes')
+    const { error } = await (supabase
+      .from('prompt_likes') as any)
       .delete()
       .eq('prompt_id', promptId)
       .eq('user_id', userId);
@@ -63,8 +63,8 @@ export async function hasUserLiked(
   promptId: string,
   userId: string
 ): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('prompt_likes')
+  const { data, error } = await (supabase
+    .from('prompt_likes') as any)
     .select('id')
     .eq('prompt_id', promptId)
     .eq('user_id', userId)
@@ -87,8 +87,8 @@ export async function getLikeCount(
   supabase: Client,
   promptId: string
 ): Promise<number> {
-  const { count, error } = await supabase
-    .from('prompt_likes')
+  const { count, error } = await (supabase
+    .from('prompt_likes') as any)
     .select('*', { count: 'exact', head: true })
     .eq('prompt_id', promptId);
 
@@ -108,8 +108,8 @@ export async function getLikedPromptsByUser(
   supabase: Client,
   userId: string
 ): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('prompt_likes')
+  const { data, error } = await (supabase
+    .from('prompt_likes') as any)
     .select('prompt_id')
     .eq('user_id', userId);
 
@@ -118,5 +118,5 @@ export async function getLikedPromptsByUser(
     return [];
   }
 
-  return data?.map((like) => like.prompt_id) || [];
+  return data?.map((like: any) => like.prompt_id) || [];
 }
