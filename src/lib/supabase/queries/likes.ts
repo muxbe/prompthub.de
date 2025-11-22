@@ -41,10 +41,10 @@ export async function toggleLike(
     // Like: add new like
     const { error } = await supabase
       .from('prompt_likes')
-      .insert([{
+      .insert({
         prompt_id: promptId,
         user_id: userId,
-      }]);
+      } as Database['public']['Tables']['prompt_likes']['Insert']);
 
     if (error) {
       console.error('Error adding like:', error);
