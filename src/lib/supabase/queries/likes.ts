@@ -16,12 +16,12 @@ export async function toggleLike(
   userId: string
 ): Promise<boolean> {
   // Check if user already liked this prompt
-  const { data: existingLike } = await supabase
+  const { data: existingLike, error: fetchError } = await supabase
     .from('prompt_likes')
     .select('id')
     .eq('prompt_id', promptId)
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
   if (existingLike) {
     // Unlike: remove the like
@@ -65,7 +65,7 @@ export async function hasUserLiked(
     .select('id')
     .eq('prompt_id', promptId)
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     // No like found (not an error condition)
